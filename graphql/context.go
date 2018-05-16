@@ -9,7 +9,7 @@ import (
 type Resolver func(ctx context.Context) (res interface{}, err error)
 type ResolverMiddleware func(ctx context.Context, next Resolver) (res interface{}, err error)
 type RequestMiddleware func(ctx context.Context, next func(ctx context.Context) []byte) []byte
-
+type ResponseMiddleware func(ctx context.Context,next func(ctx context.Context) []byte) []byte
 type RequestContext struct {
 	ErrorBuilder
 
@@ -19,6 +19,7 @@ type RequestContext struct {
 	Recover            RecoverFunc
 	ResolverMiddleware ResolverMiddleware
 	RequestMiddleware  RequestMiddleware
+	ResponseMiddleware ResponseMiddleware
 }
 
 func DefaultResolverMiddleware(ctx context.Context, next Resolver) (res interface{}, err error) {
@@ -29,6 +30,11 @@ func DefaultRequestMiddleware(ctx context.Context, next func(ctx context.Context
 	return next(ctx)
 }
 
+func DefaultResponseMiddleware(ctx context.Context, next func(ctx context.Context) []byte) []byte {
+	return next(ctx)
+}
+
+
 func NewRequestContext(doc *query.Document, query string, variables map[string]interface{}) *RequestContext {
 	return &RequestContext{
 		Doc:                doc,
@@ -36,6 +42,7 @@ func NewRequestContext(doc *query.Document, query string, variables map[string]i
 		Variables:          variables,
 		ResolverMiddleware: DefaultResolverMiddleware,
 		RequestMiddleware:  DefaultRequestMiddleware,
+		ResponseMiddleware: DefaultResponseMiddleware,
 		Recover:            DefaultRecover,
 		ErrorBuilder: ErrorBuilder{
 			ErrorPresenter: DefaultErrorPresenter,

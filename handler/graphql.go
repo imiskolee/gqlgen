@@ -26,6 +26,7 @@ type Config struct {
 	errorPresenter graphql.ErrorPresenterFunc
 	resolverHook   graphql.ResolverMiddleware
 	requestHook    graphql.RequestMiddleware
+
 }
 
 func (c *Config) newRequestContext(doc *query.Document, query string, variables map[string]interface{}) *graphql.RequestContext {

@@ -42,6 +42,10 @@ func (e *executableSchema) Query(ctx context.Context, op *query.Operation) *grap
 		return buf.Bytes()
 	})
 
+	buf = ec.ResponseMiddleware(ctx, func(ctx context.Context) []byte {
+		return buf
+	})
+
 	return &graphql.Response{
 		Data:   buf,
 		Errors: ec.Errors,
@@ -56,6 +60,10 @@ func (e *executableSchema) Mutation(ctx context.Context, op *query.Operation) *g
 		var buf bytes.Buffer
 		data.MarshalGQL(&buf)
 		return buf.Bytes()
+	})
+
+	buf = ec.ResponseMiddleware(ctx, func(ctx context.Context) []byte {
+		return buf
 	})
 
 	return &graphql.Response{
